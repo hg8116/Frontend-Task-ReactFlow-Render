@@ -33,17 +33,9 @@ const Flow = ({
     [setEdges],
   );
 
-  //  const onNodeClick = useCallback(
-  //    (event, node) => {
-  //      event.stopPropagation();
-  //
   //      setNodes((nds) => nds.filter((n) => n.id !== node.id));
-  //    },
-  //    [setNodes],
-  //  );
 
   const onNodeClick = (event, node) => {
-    console.log(node);
     setSelectedNode(node);
   };
 

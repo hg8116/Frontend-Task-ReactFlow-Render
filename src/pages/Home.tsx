@@ -1,51 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Flow from "../components/Flow.tsx";
 import { v4 as uuid } from "uuid";
 import CustomNode from "../components/CustomNode.tsx";
 
-const initialNodes = [
-  {
-    id: "1",
-    type: "customNode",
-    position: { x: 100, y: 100 },
-    data: { label: 1 },
-  },
-];
-
-const initialEdges = [];
-
 const nodeTypes = { customNode: CustomNode };
 
 const Home = () => {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
 
   const [count, setCount] = useState(2);
 
   const [selectedNode, setSelectedNode] = useState(null);
   const [tempName, setTempName] = useState(null);
 
+  useEffect(() => {
+    setSelectedNode(null);
+  }, [nodes]);
+
+  const onDeleteButton = (id) => {
+    setNodes((nds) => nds.filter((n) => n.data.id !== id));
+  };
+
   const addNode = () => {
     if (nodes.length == 0) {
-      setNodes(initialNodes);
+      setNodes([
+        {
+          id: "1",
+          type: "customNode",
+          position: { x: 100, y: 100 },
+          data: {
+            label: 1,
+            id: "1",
+            toDelete: "n",
+            onDeleteButton: onDeleteButton,
+          },
+        },
+      ]);
       return;
     }
     let lastNode = nodes[nodes.length - 1];
+    const newId = uuid();
     let newNode = {
-      id: uuid(),
+      id: newId,
       type: lastNode.type,
       position: { x: lastNode.position.x, y: lastNode.position.y + 100 },
-      data: { label: count },
+      data: {
+        label: count,
+        id: newId + "",
+        toDelete: "n",
+        onDeleteButton: onDeleteButton,
+      },
     };
     setCount(count + 1);
 
-    console.log(newNode);
     setNodes([...nodes, newNode]);
   };
 
   const onDelete = () => {
     setNodes((nds) => nds.filter((n) => n.id !== selectedNode.id));
-    setSelectedNode(nodes[0]);
+    setSelectedNode(null);
   };
 
   const onCancel = () => {
@@ -57,7 +71,7 @@ const Home = () => {
     setNodes((prevNodes) =>
       prevNodes.map((node) =>
         node.id === selectedNode.id
-          ? { ...node, data: { label: tempName } }
+          ? { ...node, data: { ...node.data, label: tempName } }
           : node,
       ),
     );
